@@ -3,6 +3,8 @@ package com.mygdx.game.States;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.mygdx.game.Stateso.GameStateManager;
+import com.mygdx.game.Stateso.State;
 
 /**
  * Created by HP on 05-03-2016.

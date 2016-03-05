@@ -1,4 +1,4 @@
-package com.mygdx.game.States;
+package com.mygdx.game.Stateso;
 
 /**
  * Created by Dell on 18-02-2016.

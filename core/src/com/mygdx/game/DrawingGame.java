@@ -234,7 +234,7 @@ public class DrawingGame extends ApplicationAdapter {
         public boolean touchDragged(int screenX, int screenY, int pointer) {
 
             if (leftDown) {
-                Vector2 curr = new Vector2(screenX*Gdx.graphics.getWidth()/1024, screenY*Gdx.graphics.getHeight()/737);
+                Vector2 curr = new Vector2(screenX, screenY);
                 drawable.drawLerped(last, curr);
                 last = curr;
                 return true;

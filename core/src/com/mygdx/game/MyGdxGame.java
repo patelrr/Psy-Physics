@@ -7,10 +7,12 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -20,6 +22,7 @@ import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 
 public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 	SpriteBatch batch;
@@ -32,8 +35,8 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 	Matrix4 debugMatrix;
 	OrthographicCamera camera;
 	BitmapFont font;
-
-
+    int x=0,y=0;
+    Array<Vector2> ar;
 	float torque = 0.0f;
 	boolean drawSprite = true;
 
@@ -45,7 +48,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 		batch = new SpriteBatch();
 		img = new Texture("badlogic.jpg");
 		sprite = new Sprite(img);
-
+		ar=new Array<Vector2>();
 		sprite.setPosition(-sprite.getWidth()/2,-sprite.getHeight()/2);
 
 		world = new World(new Vector2(0, -1f),true);
@@ -103,15 +106,15 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 	public void render() {
 		camera.update();
 		// Step the physics simulation forward at a rate of 60hz
-		world.step(1f/60f, 6, 2);
+		world.step(1f / 60f, 6, 2);
 
-		body.applyTorque(torque,true);
+		body.applyTorque(torque, true);
 
 		sprite.setPosition((body.getPosition().x * PIXELS_TO_METERS) - sprite.
-						getWidth()/2 ,
-				(body.getPosition().y * PIXELS_TO_METERS) -sprite.getHeight()/2 )
+						getWidth() / 2,
+				(body.getPosition().y * PIXELS_TO_METERS) - sprite.getHeight() / 2)
 		;
-		sprite.setRotation((float)Math.toDegrees(body.getAngle()));
+		sprite.setRotation((float) Math.toDegrees(body.getAngle()));
 
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -120,15 +123,26 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 		debugMatrix = batch.getProjectionMatrix().cpy().scale(PIXELS_TO_METERS,
 				PIXELS_TO_METERS, 0);
 		batch.begin();
-
+        try{
+			Texture pixmaptex = new Texture(pi);
+			Sprite sp=new Sprite(pixmaptex);
+			sp.setPosition(pre.getPosition().x,pre.getPosition().y);
+			batch.draw(sp,sp.getX(), sp.getY(),sp.getOriginX(),
+					sp.getOriginY(),
+					sp.getWidth(),sp.getHeight(),sp.getScaleX(),sp.
+							getScaleY(),sp.getRotation());
+		}
+		catch(Exception e){}
+		/*
 		if(drawSprite)
 			batch.draw(sprite, sprite.getX(), sprite.getY(),sprite.getOriginX(),
 					sprite.getOriginY(),
 					sprite.getWidth(),sprite.getHeight(),sprite.getScaleX(),sprite.
 							getScaleY(),sprite.getRotation());
+							*/
 
 		font.draw(batch,
-				"Restitution: " + body.getFixtureList().first().getRestitution(),
+				"Restitution: " + body.getFixtureList().first().getRestitution()+" "+x+" "+y,
 				-Gdx.graphics.getWidth()/2,
 				Gdx.graphics.getHeight()/2 );
 		batch.end();
@@ -141,7 +155,23 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 		img.dispose();
 		world.dispose();
 	}
-
+	private Body createPhysicBodies(Array<Vector2> input, World world) {
+		BodyDef bodyDef = new BodyDef();
+		bodyDef.type = BodyDef.BodyType.DynamicBody;
+		Body body = world.createBody(bodyDef);
+		for (int i = 0; i < input.size - 1; i++) {
+			Vector2 point = input.get(i);
+			Vector2 dir = input.get(i + 1).cpy().sub(point);
+			float distance = dir.len();
+			float angle = dir.angle() * MathUtils.degreesToRadians;
+			PolygonShape shape = new PolygonShape();
+			shape.setAsBox(distance / 2, 3 / 2, dir.cpy()
+					.scl(0.5f).add(point), angle);
+			body.createFixture(shape, 1.0f);
+			//shape.dispose();
+		}
+		return body;
+	}
 	@Override
 	public boolean keyDown(int keycode) {
 		return false;
@@ -196,25 +226,55 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 	public boolean keyTyped(char character) {
 		return false;
 	}
+   Pixmap pi;
+	Body pre;
+   void makenewPIx(){
+	   Pixmap pixmap = new Pixmap( 100, 100, Pixmap.Format.RGBA8888 );
+	   pixmap.setColor(0, 1, 0, 0.75f);
+	   //pixmap.fillCircle( 32, 32, 32 );
+	   pi=pixmap;
 
-
+	   //pixmap.dispose();
+   }
 	// On touch we apply force from the direction of the users touch.
 	// This could result in the object "spinning"
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		body.applyForce(1f,1f,screenX,screenY,true);
+		body.applyForce(0.1f, 0.1f, screenX, screenY, true);
+		//makenewPIx();
+		ar.clear();
+		ar.add(new Vector2(x, y));
+		//Texture pixmaptex = new Texture(pi);
 		//body.applyTorque(0.4f,true);
+		System.out.println("touch Down");
 		return true;
 	}
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		return false;
+		Body b=createPhysicBodies(ar,world);
+
+		//pre=b;
+		System.out.println("touch Up");
+
+		return true;
+
 	}
 
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		return false;
+
+		if(Math.sqrt(Math.pow((screenX-x),2)*Math.pow((screenY - y),2))>5) {
+			x=screenX;y=screenY;
+			ar.add(new Vector2(x, y));
+			System.out.println("touch Drr" + x + " " + y);
+
+		}
+		//pi.drawCircle(x % 100, x%100, 3);
+		//pi.fillCircle(x % 100, y%100,5);
+
+		return true;
+
 	}
 
 	@Override

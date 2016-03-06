@@ -1,5 +1,6 @@
 package com.mygdx.game.handlers;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.game.main.Game;
 import com.mygdx.game.states.GameState;
 import com.mygdx.game.states.Play;
@@ -28,6 +29,10 @@ public class GameStateManager {
 	
 	public void render() {
 		gameStates.peek().render();
+	}
+
+	public void rendersb(SpriteBatch sb) {
+		gameStates.peek().rendersb(sb);
 	}
 	
 	private GameState getState(int state) {

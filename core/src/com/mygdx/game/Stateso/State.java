@@ -13,11 +13,11 @@ import com.badlogic.gdx.math.Vector3;
  * Created by Brent on 6/25/2015.
  */
 public abstract class State {
-    protected GameStateManager gsm;
+    protected GameStateManagero gsm;
     protected OrthographicCamera cam;
     protected Vector3 mouse;
 
-    protected State(GameStateManager gsm){
+    protected State(GameStateManagero gsm){
         this.gsm = gsm;
 
 

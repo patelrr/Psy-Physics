@@ -2,8 +2,11 @@ package com.mygdx.game.states;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -23,7 +26,8 @@ public class Play extends GameState implements InputProcessor {
 	
 	private World world;
 	private Box2DDebugRenderer b2dr;
-	
+	BitmapFont font;
+	SpriteBatch sb;
 	private OrthographicCamera b2dCam;
 	private Body createPhysicBodies(Array<Vector2> input, World world) {
 		BodyDef bodyDef = new BodyDef();
@@ -44,22 +48,22 @@ public class Play extends GameState implements InputProcessor {
 	public Play(GameStateManager gsm) {
 		
 		super(gsm);
-		
+
 		world = new World(new Vector2(0, -9.81f), true);
 		b2dr = new Box2DDebugRenderer();
-		
+
 		// create platform
 		BodyDef bdef = new BodyDef();
 		bdef.position.set(160 / PPM, 120 / PPM);
 		bdef.type = BodyType.StaticBody;
 		Body body = world.createBody(bdef);
-		
+		font = new BitmapFont();
 		PolygonShape shape = new PolygonShape();
 		shape.setAsBox(50 / PPM, 5 / PPM);
 		FixtureDef fdef = new FixtureDef();
 		fdef.shape = shape;
 		body.createFixture(fdef);
-		
+		font.setColor(Color.RED);
 		// create falling box
 		bdef.position.set(160 / PPM, 200 / PPM);
 		bdef.type = BodyType.DynamicBody;
@@ -72,6 +76,7 @@ public class Play extends GameState implements InputProcessor {
 		// set up box2d cam
 		b2dCam = new OrthographicCamera();
 		b2dCam.setToOrtho(false, Game.V_WIDTH / PPM, Game.V_HEIGHT / PPM);
+		sb = new SpriteBatch();
 		
 	}
 	
@@ -82,16 +87,30 @@ public class Play extends GameState implements InputProcessor {
 	}
 	
 	public void render() {
-		
+
 		// clear screen
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		
+
+
+
 		// draw box2d world
 		b2dr.render(world, b2dCam.combined);
+		sb.begin();
+		font.draw(sb, "jk,bk,", 100, 100);
+		sb.dispose();
 		
 	}
-	
-	public void dispose() {}
+
+	@Override
+	public void rendersb(SpriteBatch sb) {
+		font.draw(sb, "jk,bk,",100, 100);
+	}
+
+	public void dispose() {
+
+		sb.dispose();
+		font.dispose();
+	}
 
 	@Override
 	public boolean keyDown(int keycode) {

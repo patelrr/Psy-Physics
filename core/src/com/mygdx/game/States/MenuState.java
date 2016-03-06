@@ -8,12 +8,11 @@ package com.mygdx.game.States;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.mygdx.game.Stateso.GameStateManagero;
+import com.mygdx.game.Stateso.State;
 
 /**
  * Created by Brent on 6/25/2015.
@@ -23,7 +22,7 @@ public class MenuState extends State {
     Texture playBtn;
     private Music dropSound;
     private BitmapFont font;
-    public MenuState(GameStateManager gsm) {
+    public MenuState(GameStateManagero gsm) {
         super(gsm);
         background = new Texture(Gdx.files.internal("data/back.jpg"));
         dropSound = Gdx.audio.newMusic(Gdx.files.internal("data/audio.mp3"));
@@ -42,7 +41,7 @@ public class MenuState extends State {
     @Override
     public void handleInput() {
         if(Gdx.input.justTouched()){
-            gsm.set(new PlayState(gsm));
+            gsm.set(new com.mygdx.game.States.PlayState(gsm));
         }
     }
 

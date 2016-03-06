@@ -10,7 +10,7 @@ public abstract class GameState {
 	protected GameStateManager gsm;
 	protected Game game;
 	
-	protected SpriteBatch sb;
+	public SpriteBatch sb;
 	protected OrthographicCamera cam;
 	protected OrthographicCamera hudCam;
 	
@@ -25,6 +25,7 @@ public abstract class GameState {
 	public abstract void handleInput();
 	public abstract void update(float dt);
 	public abstract void render();
+	public abstract void rendersb(SpriteBatch sb);
 	public abstract void dispose();
 	
 }

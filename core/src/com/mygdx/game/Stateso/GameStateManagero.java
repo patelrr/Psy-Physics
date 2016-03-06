@@ -10,10 +10,10 @@ import java.util.Stack;
 /**
  * Created by Brent on 6/25/2015.
  */
-public class GameStateManager {
+public class GameStateManagero {
     private Stack<State> states;
 
-    public GameStateManager(){
+    public GameStateManagero(){
         states = new Stack<State>();
     }
 

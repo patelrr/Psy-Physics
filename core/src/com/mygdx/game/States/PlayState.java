@@ -3,7 +3,7 @@ package com.mygdx.game.States;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.mygdx.game.Stateso.GameStateManager;
+import com.mygdx.game.Stateso.GameStateManagero;
 import com.mygdx.game.Stateso.State;
 
 /**
@@ -11,7 +11,7 @@ import com.mygdx.game.Stateso.State;
  */
 public class PlayState extends State {
     Texture background = new Texture("back.jpg");
-    protected PlayState(GameStateManager gsm) {
+    protected PlayState(GameStateManagero gsm) {
         super(gsm);
     }
 

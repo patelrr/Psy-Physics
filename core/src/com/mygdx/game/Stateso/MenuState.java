@@ -23,7 +23,7 @@ public class MenuState extends State {
     Texture playBtn;
     private Music dropSound;
     private BitmapFont font;
-    public MenuState(com.mygdx.game.Stateso.GameStateManager gsm) {
+    public MenuState(GameStateManagero gsm) {
         super(gsm);
         background = new Texture(Gdx.files.internal("data/back.jpg"));
         dropSound = Gdx.audio.newMusic(Gdx.files.internal("data/audio.mp3"));

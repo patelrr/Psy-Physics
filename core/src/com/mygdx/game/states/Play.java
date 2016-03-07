@@ -30,19 +30,28 @@ public class Play extends GameState implements InputProcessor {
 	BitmapFont font;
 	SpriteBatch sb;
 	private OrthographicCamera b2dCam;
-	private Body createPhysicBodies(Array<Vector2> input, World world) {
+	private static Body createPhysicBodies(Array<Vector2> input, World world) {
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.DynamicBody;
 		Body body = world.createBody(bodyDef);
 		for (int i = 0; i < input.size - 1; i++) {
 			Vector2 point = input.get(i);
 			Vector2 dir = input.get(i + 1).cpy().sub(point);
+
+			try{
 			float distance = dir.len();
+			//	if(distance<1.1)
+			//		continue;
+
 			float angle = dir.angle() * MathUtils.degreesToRadians;
+
 			PolygonShape shape = new PolygonShape();
-			shape.setAsBox(distance / 2, 3 / 2, dir.cpy()
-					.scl(0.5f).add(point), angle);
-			body.createFixture(shape, 1.0f);
+
+				shape.setAsBox(distance / 2, 1 / PPM, dir.cpy()
+						.scl(0.5f).add(point), angle);
+				body.createFixture(shape, 1.0f);
+			}
+			catch(Exception E){}
 		}
 		return body;
 	}
@@ -60,20 +69,21 @@ public class Play extends GameState implements InputProcessor {
 		Body body = world.createBody(bdef);
 		font = new BitmapFont();
 		PolygonShape shape = new PolygonShape();
-		shape.setAsBox(50 / PPM, 5 / PPM);
+		shape.setAsBox(100 / PPM, 20 / PPM);
 		FixtureDef fdef = new FixtureDef();
 		fdef.shape = shape;
 		body.createFixture(fdef);
 		font.setColor(Color.RED);
 		// create falling box
+		/*
 		bdef.position.set(160 / PPM, 200 / PPM);
 		bdef.type = BodyType.DynamicBody;
 		body = world.createBody(bdef);
 		
-		shape.setAsBox(5 / PPM, 5 / PPM);
+		shape.setAsBox(20 / PPM, 20 / PPM);
 		fdef.shape = shape;
 		body.createFixture(fdef);
-		
+		*/
 		// set up box2d cam
 		b2dCam = new OrthographicCamera();
 		b2dCam.setToOrtho(false, Game.V_WIDTH / PPM, Game.V_HEIGHT / PPM);
@@ -143,8 +153,10 @@ public class Play extends GameState implements InputProcessor {
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-
-		createbody(ar, world);
+		x=screenX;y=(Gdx.graphics.getHeight()-screenY);
+		ar.add(new Vector2(x / PPM, y / PPM));
+		createPhysicBodies(ar,world);
+		//createbody(ar, world);
 
 		count=0;
 		//pre=b;
@@ -187,7 +199,7 @@ public class Play extends GameState implements InputProcessor {
 		if(Math.sqrt(Math.pow((screenX-x),2)*Math.pow((Gdx.graphics.getHeight()-screenY - y),2))>50) {
 			x=screenX;y=(Gdx.graphics.getHeight()-screenY);
 			count++;
-			if(count<8)
+			//if(count<8)
 				ar.add(new Vector2(x / PPM, y / PPM));
 
 			System.out.println("touch Drr" + x + " " + y);

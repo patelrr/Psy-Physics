@@ -2,18 +2,20 @@ package com.mygdx.game.states;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -40,6 +42,11 @@ public class Play extends GameState implements InputProcessor {
 
 			try{
 			float distance = dir.len();
+
+
+				System.out.println("---->"+distance);
+				if(distance<0.00)
+					continue;
 			//	if(distance<1.1)
 			//		continue;
 
@@ -52,6 +59,7 @@ public class Play extends GameState implements InputProcessor {
 				body.createFixture(shape, 1.0f);
 			}
 			catch(Exception E){}
+
 		}
 		return body;
 	}
@@ -64,16 +72,54 @@ public class Play extends GameState implements InputProcessor {
 		ar=new Array<Vector2>();
 		// create platform
 		BodyDef bdef = new BodyDef();
-		bdef.position.set(160 / PPM, 120 / PPM);
+		bdef.position.set(80 / PPM, 120 / PPM);
 		bdef.type = BodyType.StaticBody;
 		Body body = world.createBody(bdef);
 		font = new BitmapFont();
+
 		PolygonShape shape = new PolygonShape();
-		shape.setAsBox(100 / PPM, 20 / PPM);
+		shape.setAsBox(50 / PPM, 120 / PPM);
 		FixtureDef fdef = new FixtureDef();
 		fdef.shape = shape;
 		body.createFixture(fdef);
-		font.setColor(Color.RED);
+
+		//second
+		bdef.position.set(500 / PPM, 120 / PPM);
+		bdef.type = BodyType.StaticBody;
+		Body bodys = world.createBody(bdef);
+
+		PolygonShape shapes = new PolygonShape();
+		shapes.setAsBox(50 / PPM, 120 / PPM);
+		FixtureDef fdefs = new FixtureDef();
+		fdefs.shape = shapes;
+		bodys.createFixture(fdefs);
+
+
+		//circle
+		BodyDef bodyDef = new BodyDef();
+// We set our body to dynamic, for something like ground which doesn't move we would set it to StaticBody
+		bodyDef.type = BodyType.DynamicBody;
+// Set our body's starting position in the world
+		bodyDef.position.set(510 / PPM, 130 / PPM);
+		Body bodycircle = world.createBody(bodyDef);
+
+// Create a circle shape and set its radius to 6
+		CircleShape circle = new CircleShape();
+		circle.setRadius(10f/PPM);
+
+// Create a fixture definition to apply our shape to
+		FixtureDef fixtureDef = new FixtureDef();
+		fixtureDef.shape = circle;
+		fixtureDef.density = 0.5f;
+		fixtureDef.friction = 0.4f;
+		fixtureDef.restitution = 0.2f; // Make it bounce a little bit
+
+// Create our fixture and attach it to the body
+		Fixture fixture = bodycircle.createFixture(fixtureDef);
+
+// Remember to dispose of any shapes after you're done with them!
+// BodyDef and FixtureDef don't need disposing, but shapes do.
+		circle.dispose();
 		// create falling box
 		/*
 		bdef.position.set(160 / PPM, 200 / PPM);
@@ -122,6 +168,11 @@ public class Play extends GameState implements InputProcessor {
 	}
 
 	@Override
+	public void resize(int w, int h) {
+
+	}
+
+	@Override
 	public boolean keyDown(int keycode) {
 		return false;
 	}
@@ -138,12 +189,14 @@ public class Play extends GameState implements InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-
-
+		Vector3 touch = new Vector3();
+		b2dCam.unproject(touch.set(screenX, screenY, 0));
+        touch.x=touch.x*PPM;
+		touch.y=touch.y*PPM;
 		//body.applyForce(0.1f, 0.1f, screenX, screenY, true);
 		//makenewPIx();
 		ar.clear();
-		ar.add(new Vector2(screenX/PPM, (Gdx.graphics.getHeight()-screenY)/PPM));
+		ar.add(new Vector2(touch.x/PPM, (touch.y)/PPM));
 
 		//Texture pixmaptex = new Texture(pi);
 		//body.applyTorque(0.4f,true);
@@ -153,7 +206,11 @@ public class Play extends GameState implements InputProcessor {
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		x=screenX;y=(Gdx.graphics.getHeight()-screenY);
+		Vector3 touch = new Vector3();
+		b2dCam.unproject(touch.set(screenX, screenY, 0));
+		touch.x=touch.x*PPM;
+		touch.y=touch.y*PPM;
+		x=(int)touch.x;y= (int) (touch.y);
 		ar.add(new Vector2(x / PPM, y / PPM));
 		createPhysicBodies(ar,world);
 		//createbody(ar, world);
@@ -194,10 +251,15 @@ public class Play extends GameState implements InputProcessor {
 	int count=0;
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		Vector3 touch = new Vector3();
+		b2dCam.unproject(touch.set(screenX, screenY, 0));
+		touch.x=touch.x*PPM;
+		touch.y=touch.y*PPM;
+		System.out.println(touch.x+" "+touch.y);
 		//System.out.println(Gdx.graphics.getWidth()+" "+Gdx.graphics.getHeight());
 		//y=Gdx.graphics.getHeight()-screenY;
-		if(Math.sqrt(Math.pow((screenX-x),2)*Math.pow((Gdx.graphics.getHeight()-screenY - y),2))>50) {
-			x=screenX;y=(Gdx.graphics.getHeight()-screenY);
+		if(Math.sqrt(Math.pow((touch.x-x),2)*Math.pow((touch.y - y),2))>50) {
+			x= (int) touch.x;y= (int) (touch.y);
 			count++;
 			//if(count<8)
 				ar.add(new Vector2(x / PPM, y / PPM));

@@ -9,8 +9,8 @@ import com.mygdx.game.handlers.GameStateManager;
 public class Game implements ApplicationListener {
 	
 	public static final String TITLE = "Block Bunny";
-	public static final int V_WIDTH = 600;
-	public static final int V_HEIGHT = 600;
+	public static final int V_WIDTH = 800;
+	public static final int V_HEIGHT = 480;
 	public static final int SCALE = 2;
 	
 	public static final float STEP = 1 / 60f;
@@ -57,7 +57,9 @@ public class Game implements ApplicationListener {
 	public OrthographicCamera getCamera() { return cam; }
 	public OrthographicCamera getHUDCamera() { return hudCam; }
 	
-	public void resize(int w, int h) {}
+	public void resize(int w, int h) {
+		gsm.resize(w,h);
+	}
 	public void pause() {}
 	public void resume() {}
 	

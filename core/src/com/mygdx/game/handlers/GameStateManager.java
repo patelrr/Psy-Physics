@@ -53,6 +53,9 @@ public class GameStateManager {
 		GameState g = gameStates.pop();
 		g.dispose();
 	}
+	public void resize(int w,int h){
+		gameStates.peek().resize(w,h);
+	}
 	
 }
 

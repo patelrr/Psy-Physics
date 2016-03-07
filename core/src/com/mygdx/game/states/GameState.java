@@ -27,6 +27,7 @@ public abstract class GameState {
 	public abstract void render();
 	public abstract void rendersb(SpriteBatch sb);
 	public abstract void dispose();
+	public abstract void resize(int w,int h);
 	
 }
 

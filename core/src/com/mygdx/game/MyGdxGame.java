@@ -40,7 +40,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 	float torque = 0.0f;
 	boolean drawSprite = true;
 
-	final float PIXELS_TO_METERS = 100f;
+	final float PIXELS_TO_METERS = 1000f;
 
 	@Override
 	public void create() {
@@ -91,7 +91,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 		bodyEdgeScreen = world.createBody(bodyDef2);
 		bodyEdgeScreen.createFixture(fixtureDef2);
 		edgeShape.dispose();
-
+		createbodys(world);
 		Gdx.input.setInputProcessor(this);
 
 		debugRenderer = new Box2DDebugRenderer();
@@ -123,6 +123,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 		debugMatrix = batch.getProjectionMatrix().cpy().scale(PIXELS_TO_METERS,
 				PIXELS_TO_METERS, 0);
 		batch.begin();
+		/*
         try{
 			Texture pixmaptex = new Texture(pi);
 			Sprite sp=new Sprite(pixmaptex);
@@ -165,7 +166,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 			float distance = dir.len();
 			float angle = dir.angle() * MathUtils.degreesToRadians;
 			PolygonShape shape = new PolygonShape();
-			shape.setAsBox(distance / 2, 3 / 2, dir.cpy()
+			shape.setAsBox(distance / 2, 3 / 1, dir.cpy()
 					.scl(0.5f).add(point), angle);
 			body.createFixture(shape, 1.0f);
 			//shape.dispose();
@@ -236,14 +237,54 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 
 	   //pixmap.dispose();
    }
+	void createbodys( World world){
+		BodyDef bodyDef = new BodyDef();
+		bodyDef.type = BodyDef.BodyType.DynamicBody;
+		Body body = world.createBody(bodyDef);
+
+
+			EdgeShape es=new EdgeShape();
+			es.set(1/PIXELS_TO_METERS, 1/PIXELS_TO_METERS, 1/PIXELS_TO_METERS, 2/PIXELS_TO_METERS);
+			body.createFixture(es, 1.0f);
+			return;
+
+
+
+	}
 	// On touch we apply force from the direction of the users touch.
 	// This could result in the object "spinning"
+	void createbody(Array<Vector2> input, World world){
+		BodyDef bodyDef = new BodyDef();
+		bodyDef.position.set(input.get(0).x /
+						PIXELS_TO_METERS,
+				(input.get(0).y / PIXELS_TO_METERS));
+		bodyDef.type = BodyDef.BodyType.DynamicBody;
+		Body body = world.createBody(bodyDef);
+		System.out.println(input.size);
+		if(input.size<2)
+			return;
+		if(input.size<=3){
+			EdgeShape es=new EdgeShape();
+			es.set(input.get(0),input.get(1));
+			body.createFixture(es, 1.0f);
+			return;
+		}
+		PolygonShape shape = new PolygonShape();
+		Vector2 tmp[]=new Vector2[input.size-1];
+        for(int i=0;i<input.size-1;i++){
+			tmp[i]=input.get(i);
+		}
+		shape.set(tmp);
+		body.createFixture(shape, 1.0f);
+		shape.dispose();
+	}
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		body.applyForce(0.1f, 0.1f, screenX, screenY, true);
 		//makenewPIx();
 		ar.clear();
 		ar.add(new Vector2(x, y));
+
 		//Texture pixmaptex = new Texture(pi);
 		//body.applyTorque(0.4f,true);
 		System.out.println("touch Down");
@@ -252,21 +293,25 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		Body b=createPhysicBodies(ar,world);
-
+		createbody(ar, world);
+		createbodys(world);
+		count=0;
 		//pre=b;
 		System.out.println("touch Up");
 
 		return true;
 
 	}
-
+	int count=0;
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
 
-		if(Math.sqrt(Math.pow((screenX-x),2)*Math.pow((screenY - y),2))>5) {
+		if(Math.sqrt(Math.pow((screenX-x),2)*Math.pow((screenY - y),2))>10) {
 			x=screenX;y=screenY;
-			ar.add(new Vector2(x, y));
+			count++;
+			if(count<8)
+				ar.add(new Vector2(x / PIXELS_TO_METERS, y / PIXELS_TO_METERS));
+
 			System.out.println("touch Drr" + x + " " + y);
 
 		}

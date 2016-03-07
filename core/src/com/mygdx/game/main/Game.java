@@ -1,6 +1,7 @@
 package com.mygdx.game.main;
 
 import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.game.handlers.GameStateManager;
@@ -34,21 +35,17 @@ public class Game implements ApplicationListener {
 	}
 	
 	public void render() {
-/*
+
 		accum += Gdx.graphics.getDeltaTime();
 		while(accum >= STEP) {
 			accum -= STEP;
 			gsm.update(STEP);
-			sb.begin();
+
 			gsm.render();
-			sb.dispose();
+
 		}
-		*/
+
 //		sb.dispose();
-		sb.setProjectionMatrix(hudCam.combined);
-		sb.begin();
-		//sb.draw();
-		sb.dispose();
 
 	}
 	

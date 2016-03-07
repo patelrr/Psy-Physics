@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -51,7 +52,7 @@ public class Play extends GameState implements InputProcessor {
 
 		world = new World(new Vector2(0, -9.81f), true);
 		b2dr = new Box2DDebugRenderer();
-
+		ar=new Array<Vector2>();
 		// create platform
 		BodyDef bdef = new BodyDef();
 		bdef.position.set(160 / PPM, 120 / PPM);
@@ -77,6 +78,7 @@ public class Play extends GameState implements InputProcessor {
 		b2dCam = new OrthographicCamera();
 		b2dCam.setToOrtho(false, Game.V_WIDTH / PPM, Game.V_HEIGHT / PPM);
 		sb = new SpriteBatch();
+		Gdx.input.setInputProcessor(this);
 		
 	}
 	
@@ -95,21 +97,18 @@ public class Play extends GameState implements InputProcessor {
 
 		// draw box2d world
 		b2dr.render(world, b2dCam.combined);
-		sb.begin();
-		font.draw(sb, "jk,bk,", 100, 100);
-		sb.dispose();
+
 		
 	}
 
 	@Override
 	public void rendersb(SpriteBatch sb) {
-		font.draw(sb, "jk,bk,",100, 100);
+		font.draw(sb, "jk,bk,", 100, 100);
 	}
 
 	public void dispose() {
 
-		sb.dispose();
-		font.dispose();
+
 	}
 
 	@Override
@@ -129,18 +128,74 @@ public class Play extends GameState implements InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		return false;
+
+
+		//body.applyForce(0.1f, 0.1f, screenX, screenY, true);
+		//makenewPIx();
+		ar.clear();
+		ar.add(new Vector2(x/PPM, y/PPM));
+
+		//Texture pixmaptex = new Texture(pi);
+		//body.applyTorque(0.4f,true);
+		System.out.println("touch Down");
+		return true;
 	}
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
 
-		return false;
-	}
+		createbody(ar, world);
 
+		count=0;
+		//pre=b;
+		System.out.println("touch Up");
+
+		return true;
+	}
+	void createbody(Array<Vector2> input, World world){
+		BodyDef bodyDef = new BodyDef();
+		bodyDef.position.set(input.get(0).x /
+						PPM,
+				(input.get(0).y / PPM));
+		bodyDef.type = BodyDef.BodyType.DynamicBody;
+		Body body = world.createBody(bodyDef);
+		System.out.println(input.size);
+		if(input.size<2)
+			return;
+		if(input.size<=3){
+			EdgeShape es=new EdgeShape();
+			es.set(input.get(0),input.get(1));
+			body.createFixture(es, 1.0f);
+			return;
+		}
+		PolygonShape shape = new PolygonShape();
+		Vector2 tmp[]=new Vector2[input.size-1];
+		for(int i=0;i<input.size-1;i++){
+			tmp[i]=input.get(i);
+		}
+		shape.set(tmp);
+		body.createFixture(shape, 1.0f);
+		shape.dispose();
+	}
+	int x=0,y=0;
+	Array<Vector2> ar;
+	int count=0;
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		return false;
+
+		if(Math.sqrt(Math.pow((screenX-x),2)*Math.pow((screenY - y),2))>10) {
+			x=screenX;y=screenY;
+			count++;
+			if(count<8)
+				ar.add(new Vector2(x / PPM, y / PPM));
+
+			System.out.println("touch Drr" + x + " " + y);
+
+		}
+		//pi.drawCircle(x % 100, x%100, 3);
+		//pi.fillCircle(x % 100, y%100,5);
+
+		return true;
 	}
 
 	@Override

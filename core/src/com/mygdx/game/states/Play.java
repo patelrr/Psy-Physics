@@ -133,7 +133,7 @@ public class Play extends GameState implements InputProcessor {
 		//body.applyForce(0.1f, 0.1f, screenX, screenY, true);
 		//makenewPIx();
 		ar.clear();
-		ar.add(new Vector2(x/PPM, y/PPM));
+		ar.add(new Vector2(screenX/PPM, (Gdx.graphics.getHeight()-screenY)/PPM));
 
 		//Texture pixmaptex = new Texture(pi);
 		//body.applyTorque(0.4f,true);
@@ -182,9 +182,10 @@ public class Play extends GameState implements InputProcessor {
 	int count=0;
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
-
-		if(Math.sqrt(Math.pow((screenX-x),2)*Math.pow((screenY - y),2))>10) {
-			x=screenX;y=screenY;
+		//System.out.println(Gdx.graphics.getWidth()+" "+Gdx.graphics.getHeight());
+		//y=Gdx.graphics.getHeight()-screenY;
+		if(Math.sqrt(Math.pow((screenX-x),2)*Math.pow((Gdx.graphics.getHeight()-screenY - y),2))>50) {
+			x=screenX;y=(Gdx.graphics.getHeight()-screenY);
 			count++;
 			if(count<8)
 				ar.add(new Vector2(x / PPM, y / PPM));

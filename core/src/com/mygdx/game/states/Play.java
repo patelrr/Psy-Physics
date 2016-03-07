@@ -57,7 +57,9 @@ public class Play extends GameState implements InputProcessor {
 				shape.setAsBox(distance / 2, 1 / PPM, dir.cpy()
 						.scl(0.5f).add(point), angle);
 				body.createFixture(shape, 1.0f);
+				shape.dispose();
 			}
+
 			catch(Exception E){}
 
 		}
@@ -72,7 +74,7 @@ public class Play extends GameState implements InputProcessor {
 		ar=new Array<Vector2>();
 		// create platform
 		BodyDef bdef = new BodyDef();
-		bdef.position.set(80 / PPM, 120 / PPM);
+		bdef.position.set(120 / PPM, 120 / PPM);
 		bdef.type = BodyType.StaticBody;
 		Body body = world.createBody(bdef);
 		font = new BitmapFont();
@@ -84,7 +86,7 @@ public class Play extends GameState implements InputProcessor {
 		body.createFixture(fdef);
 
 		//second
-		bdef.position.set(500 / PPM, 120 / PPM);
+		bdef.position.set(680 / PPM, 120 / PPM);
 		bdef.type = BodyType.StaticBody;
 		Body bodys = world.createBody(bdef);
 
@@ -100,7 +102,7 @@ public class Play extends GameState implements InputProcessor {
 // We set our body to dynamic, for something like ground which doesn't move we would set it to StaticBody
 		bodyDef.type = BodyType.DynamicBody;
 // Set our body's starting position in the world
-		bodyDef.position.set(510 / PPM, 130 / PPM);
+		bodyDef.position.set(670 / PPM, 210 / PPM);
 		Body bodycircle = world.createBody(bodyDef);
 
 // Create a circle shape and set its radius to 6
@@ -112,7 +114,7 @@ public class Play extends GameState implements InputProcessor {
 		fixtureDef.shape = circle;
 		fixtureDef.density = 0.5f;
 		fixtureDef.friction = 0.4f;
-		fixtureDef.restitution = 0.2f; // Make it bounce a little bit
+		fixtureDef.restitution = 0.0f; // Make it bounce a little bit
 
 // Create our fixture and attach it to the body
 		Fixture fixture = bodycircle.createFixture(fixtureDef);

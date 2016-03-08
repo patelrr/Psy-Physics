@@ -18,6 +18,7 @@ import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.QueryCallback;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.handlers.GameStateManager;
@@ -33,6 +34,9 @@ public class Play extends GameState implements InputProcessor {
 	SpriteBatch sb;
 	private OrthographicCamera b2dCam;
 	private static Body createPhysicBodies(Array<Vector2> input, World world) {
+		System.out.println("Size :"+input.size);
+		if(input.size<=2)
+			return null;
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.DynamicBody;
 		Body body = world.createBody(bodyDef);
@@ -45,7 +49,11 @@ public class Play extends GameState implements InputProcessor {
 
 
 				System.out.println("---->"+distance);
+				if(distance==0.00)
+					continue;
 				if(distance<0.00)
+					continue;
+				if(distance==1.19209289)
 					continue;
 			//	if(distance<1.1)
 			//		continue;
@@ -54,7 +62,7 @@ public class Play extends GameState implements InputProcessor {
 
 			PolygonShape shape = new PolygonShape();
 
-				shape.setAsBox(distance / 2, 1 / PPM, dir.cpy()
+				shape.setAsBox(distance / 2, 2 / PPM, dir.cpy()
 						.scl(0.5f).add(point), angle);
 				body.createFixture(shape, 1.0f);
 				shape.dispose();
@@ -139,7 +147,26 @@ public class Play extends GameState implements InputProcessor {
 		Gdx.input.setInputProcessor(this);
 		
 	}
-	
+
+	Vector3 testPoint = new Vector3();
+	QueryCallback callback = new QueryCallback() {
+		@Override
+		public boolean reportFixture (Fixture fixture) {
+			// if the hit fixture's body is the ground body
+			// we ignore it
+
+			System.out.println("Here");
+			hitBody = fixture.getBody();
+			// if the hit point is inside the fixture of the body
+			// we report it
+			if (fixture.testPoint(testPoint.x, testPoint.y)) {
+				System.out.println("Here1");
+				hitBody = fixture.getBody();
+				return false;
+			} else
+				return true;
+		}
+	};
 	public void handleInput() {}
 	
 	public void update(float dt) {
@@ -188,11 +215,25 @@ public class Play extends GameState implements InputProcessor {
 	public boolean keyTyped(char character) {
 		return false;
 	}
-
+	Body hitBody = null;
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		Vector3 touch = new Vector3();
 		b2dCam.unproject(touch.set(screenX, screenY, 0));
+
+		testPoint.set(x, y, 0);
+		b2dCam.unproject(testPoint);
+
+		// ask the world which bodies are within the given
+		// bounding box around the mouse pointer
+		hitBody = null;
+		world.QueryAABB(callback, testPoint.x - 0.1f, testPoint.y - 0.1f, testPoint.x + 0.1f, testPoint.y + 0.1f);
+
+		if(hitBody!=null){
+			System.out.println("Found Body");
+			hitBody.applyForceToCenter(new Vector2(5, 0), true);
+			//world.destroyBody(hitBody);
+		}
         touch.x=touch.x*PPM;
 		touch.y=touch.y*PPM;
 		//body.applyForce(0.1f, 0.1f, screenX, screenY, true);

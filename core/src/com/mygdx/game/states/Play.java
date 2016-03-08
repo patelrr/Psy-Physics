@@ -24,6 +24,8 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.handlers.GameStateManager;
 import com.mygdx.game.main.Game;
 
+import java.util.Stack;
+
 import static com.mygdx.game.handlers.B2DVars.PPM;
 
 public class Play extends GameState implements InputProcessor {
@@ -32,8 +34,9 @@ public class Play extends GameState implements InputProcessor {
 	private Box2DDebugRenderer b2dr;
 	BitmapFont font;
 	SpriteBatch sb;
+	Stack<Body> undo;
 	private OrthographicCamera b2dCam;
-	private static Body createPhysicBodies(Array<Vector2> input, World world) {
+	private Body createPhysicBodies(Array<Vector2> input, World world) {
 		System.out.println("Size :"+input.size);
 		if(input.size<=2)
 			return null;
@@ -53,8 +56,8 @@ public class Play extends GameState implements InputProcessor {
 					continue;
 				if(distance<0.00)
 					continue;
-				if(distance==1.19209289)
-					continue;
+				//if(distance==1.19209289)
+				//	continue;
 			//	if(distance<1.1)
 			//		continue;
 
@@ -71,6 +74,7 @@ public class Play extends GameState implements InputProcessor {
 			catch(Exception E){}
 
 		}
+		undo.push(body);
 		return body;
 	}
 	public Play(GameStateManager gsm) {
@@ -80,6 +84,7 @@ public class Play extends GameState implements InputProcessor {
 		world = new World(new Vector2(0, -9.81f), true);
 		b2dr = new Box2DDebugRenderer();
 		ar=new Array<Vector2>();
+		undo=new Stack<Body>();
 		// create platform
 		BodyDef bdef = new BodyDef();
 		bdef.position.set(120 / PPM, 120 / PPM);
@@ -210,10 +215,40 @@ public class Play extends GameState implements InputProcessor {
 	public boolean keyUp(int keycode) {
 		return false;
 	}
+	public void updatePoints(Array<Vector2> ar, World world){
 
+		Array<Vector2> arr = new Array<Vector2>();
+		Vector2 q = null,r = null;
+
+		System.out.println("Array : -");
+		for (int i=0 ; i<ar.size ; i++)
+			System.out.println(ar.get(i).x + "|" + ar.get(i).y);
+
+		System.out.println("New array : -");
+		for (int i=0 ; i<ar.size-1 ; i++){
+			Vector2 p1 = ar.get(i);
+			Vector2 p2 = ar.get(i + 1);
+			float x,y;
+			x = (3*p1.x)/4 + (1*p2.x)/4;
+			y = (3*p1.y)/4 + (1*p2.y)/4;
+			q = new Vector2(x,y);
+			x = (1*p1.x)/4 + (3*p2.x)/4;
+			y = (1*p1.y)/4 + (3*p2.y)/4;
+			r = new Vector2(x,y);
+			System.out.println(q.x+"|"+q.y+" "+r.x+"|"+r.y);
+			arr.add(q);
+			arr.add(r);
+		}
+
+		createPhysicBodies(arr,world);
+	}
 	@Override
 	public boolean keyTyped(char character) {
-		return false;
+
+		if (character == 'w') { //it's the 'D' key
+			world.destroyBody(undo.pop());
+		}
+		return true;
 	}
 	Body hitBody = null;
 	@Override
@@ -232,6 +267,15 @@ public class Play extends GameState implements InputProcessor {
 		if(hitBody!=null){
 			System.out.println("Found Body");
 			hitBody.applyForceToCenter(new Vector2(5, 0), true);
+			/*
+			Array<Body> bodies = new Array<Body>();
+			world.getBodies(bodies);
+    			for(Body b : bodies){
+        			if(b.getPosition().y<-20f){
+        		world.destroyBody(b);
+        	}
+    			}
+			 */
 			//world.destroyBody(hitBody);
 		}
         touch.x=touch.x*PPM;
@@ -255,7 +299,8 @@ public class Play extends GameState implements InputProcessor {
 		touch.y=touch.y*PPM;
 		x=(int)touch.x;y= (int) (touch.y);
 		ar.add(new Vector2(x / PPM, y / PPM));
-		createPhysicBodies(ar,world);
+		updatePoints(ar, world);
+		//createPhysicBodies(ar,world);
 		//createbody(ar, world);
 
 		count=0;
@@ -301,7 +346,7 @@ public class Play extends GameState implements InputProcessor {
 		System.out.println(touch.x+" "+touch.y);
 		//System.out.println(Gdx.graphics.getWidth()+" "+Gdx.graphics.getHeight());
 		//y=Gdx.graphics.getHeight()-screenY;
-		if(Math.sqrt(Math.pow((touch.x-x),2)*Math.pow((touch.y - y),2))>50) {
+		if(Math.sqrt(Math.pow((touch.x-x),2)*Math.pow((touch.y - y),2))>100) {
 			x= (int) touch.x;y= (int) (touch.y);
 			count++;
 			//if(count<8)

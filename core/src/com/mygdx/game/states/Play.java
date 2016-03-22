@@ -92,6 +92,7 @@ public class Play extends GameState implements InputProcessor {
 		return body;
 	}
 	Body bodycircle;
+	int dirty=0;
 	Texture img;
 	public Play(GameStateManager gsm) {
 		
@@ -107,6 +108,8 @@ public class Play extends GameState implements InputProcessor {
 		bdef.position.set(120 / PPM, 120 / PPM);
 		bdef.type = BodyType.StaticBody;
 		Body body = world.createBody(bdef);
+
+
 		font = new BitmapFont();
 		all= new ArrayList<Body>();
 		tall= new ArrayList<Texture>();
@@ -120,7 +123,17 @@ public class Play extends GameState implements InputProcessor {
 		bdef.position.set(680 / PPM, 120 / PPM);
 		bdef.type = BodyType.StaticBody;
 		Body bodys = world.createBody(bdef);
+		pixmap = new Pixmap( Gdx.graphics.getWidth(),
+				Gdx.graphics.getHeight(), Pixmap.Format.RGBA8888);
 
+		pixmap.setColor(new Color(0, 0, 0, 0));
+		pixmap.fill();
+		pixmap.setColor(1, 1, 0, 0.75f);
+		drawLerped(new Vector2(5, 0), new Vector2(5, 10));
+		drawLerped(new Vector2(10, 0), new Vector2(10, 10));
+		pixmaptex=new Texture(pixmap);
+		all.add(body);
+		tall.add(pixmaptex);
 		PolygonShape shapes = new PolygonShape();
 		shapes.setAsBox(50 / PPM, 120 / PPM);
 		FixtureDef fdefs = new FixtureDef();
@@ -206,32 +219,55 @@ public class Play extends GameState implements InputProcessor {
 
 		// clear screen
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-/*
+
         for(int i=0;i<all.size();i++){
 			if(all.get(i).getPosition().y<-10){
 				world.destroyBody(all.get(i));
 				all.remove(i);
+				tall.remove(i);
 				System.out.println("Removed "+i);
 			}
 		}
-*/
+
 		b2dr.render(world, b2dCam.combined);
 		sb.begin();
 
-		sb.draw(img,0,0);
+		//sb.draw(img,0,0);
+/*
 		for(int i=0;i<tall.size();i++){
 			Sprite s=new Sprite(tall.get(i));
-			s.setOrigin(all.get(i).getPosition().x, all.get(i).getPosition().y);
+			s.setOrigin(all.get(i).getWorldCenter().x, all.get(i).getWorldCenter().y);
+			//s.setPosition(all.get(i).getWorldCenter().x*PPM, all.get(i).getWorldCenter().y*PPM);
 			s.setPosition(all.get(i).getPosition().x * PPM, all.get(i).getPosition().y * PPM);
 			s.setRotation((float) all.get(i).getAngle()* MathUtils.radiansToDegrees);
-			//s.draw(sb);
-
+			s.draw(sb);
+/*
 			sb.draw(s, s.getX(), s.getY(),s.getOriginX(),
 					s.getOriginY(),
 					s.getWidth(),s.getHeight(),s.getScaleX(),s.
 							getScaleY(),s.getRotation());
+							*/
 
-		}
+//		}
+
+		//pixmaptex= ;
+
+			if(dirty==1) {
+				//Pixmap p=pixmap;
+				//System.out.println("Hereee "+p.getHeight()+p.getFormat());
+				//pixmaptex= new Texture(p);
+				runtime.draw(pixmap, 0, 0);
+				//pixmap.dispose();
+
+				Sprite s=new Sprite(runtime);
+				s.draw(sb);
+
+				//pixmaptex.dispose();
+				//p.dispose();
+
+			}
+
+		//pixmap.dispose();
 		//sb.draw(pixmaptex, 0, 0);
 			//System.out.println("Did");
 
@@ -242,7 +278,7 @@ public class Play extends GameState implements InputProcessor {
 
 		
 	}
-
+    Texture runtime;
 	@Override
 	public void rendersb(SpriteBatch sb) {
 		font.draw(sb, "jk,bk,", 100, 100);
@@ -286,8 +322,8 @@ public class Play extends GameState implements InputProcessor {
 			q = new Vector2(x,y);
 			x = (1*p1.x)/4 + (3*p2.x)/4;
 			y = (1*p1.y)/4 + (3*p2.y)/4;
-			r = new Vector2(x,y);
-			System.out.println(q.x+"|"+q.y+" "+r.x+"|"+r.y);
+			r = new Vector2(x, y);
+			System.out.println(q.x+"|"+q.y+" "+r.x+"|" + r.y);
 			arr.add(q);
 			arr.add(r);
 		}
@@ -299,7 +335,8 @@ public class Play extends GameState implements InputProcessor {
 
 		if (character == 'w') { //it's the 'D' key
 			world.destroyBody(all.get(all.size()-1));
-			all.remove(all.size()-1);
+			all.remove(all.size() - 1);
+			tall.remove(tall.size()-1);
 		}
 		return true;
 	}
@@ -308,6 +345,7 @@ public class Play extends GameState implements InputProcessor {
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		Vector3 touch = new Vector3();
+
 		b2dCam.unproject(touch.set(screenX, screenY, 0));
 
 		testPoint.set(x, y, 0);
@@ -332,23 +370,24 @@ public class Play extends GameState implements InputProcessor {
 			 */
 			//world.destroyBody(hitBody);
 		}
-
+		System.out.println("Ready ::"+touch.x*PPM+" "+touch.y*PPM);
+		last=new Vector2(touch.x*PPM,touch.y*PPM);
         touch.x=touch.x*PPM;
 		touch.y=touch.y*PPM;
 		//body.applyForce(0.1f, 0.1f, screenX, screenY, true);
 		//makenewPIx();
 		pixmap = new Pixmap( Gdx.graphics.getWidth(),
 				Gdx.graphics.getHeight(), Pixmap.Format.RGBA8888);
-
+		runtime=new Texture(pixmap);
 		pixmap.setColor(new Color(0, 0, 0, 0));
 		pixmap.fill();
 		pixmap.setColor(0, 1, 0, 0.75f);
 		//pixmap.fillCircle(32, 32, 32);
 		//pixmap.fillCircle( (int)touch.x, (int)touch.y, 1 );
 		ar.clear();
-		last=new Vector2(touch.x,touch.y);
-		ar.add(new Vector2(touch.x/PPM, (touch.y)/PPM));
 
+		ar.add(new Vector2(touch.x/PPM, (touch.y)/PPM));
+		dirty=1;
 		//Texture pixmaptex = new Texture(pi);
 		//body.applyTorque(0.4f,true);
 		System.out.println("touch Down");
@@ -358,6 +397,7 @@ public class Play extends GameState implements InputProcessor {
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
 		Vector3 touch = new Vector3();
+		dirty=0;
 		b2dCam.unproject(touch.set(screenX, screenY, 0));
 		touch.x=touch.x*PPM;
 		touch.y=touch.y*PPM;
@@ -410,14 +450,20 @@ public class Play extends GameState implements InputProcessor {
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
 		Vector3 touch = new Vector3();
 		b2dCam.unproject(touch.set(screenX, screenY, 0));
-
+		//dirty=0;
 		touch.x=touch.x*PPM;
 		touch.y=touch.y*PPM;
 		System.out.println(touch.x+" "+touch.y);
+		System.out.println("Ready ::"+touch.x+" "+touch.y);
+
+			System.out.println("UReady ::"+touch.x+" "+touch.y);
+			drawLerped(new Vector2((int) last.x, Gdx.graphics.getHeight() - (int) last.y), new Vector2(touch.x, Gdx.graphics.getHeight() - touch.y));
+			last=new Vector2(touch.x, touch.y);
+
 
 		//System.out.println(Gdx.graphics.getWidth()+" "+Gdx.graphics.getHeight());
 		//y=Gdx.graphics.getHeight()-screenY;
-		if(Math.sqrt(Math.pow((touch.x-x),2)*Math.pow((touch.y - y),2))>75) {
+		if(Math.sqrt(Math.pow((touch.x-x),2)+Math.pow((touch.y - y),2))>20) {
 			x= (int) touch.x;y= (int) (touch.y);
 			count++;
 
@@ -425,9 +471,8 @@ public class Play extends GameState implements InputProcessor {
 				ar.add(new Vector2(x / PPM, y / PPM));
 			System.out.println("Last" + last.x + " " + last.y);
 			//pixmap.drawLine((int) last.x, Gdx.graphics.getHeight() - (int) last.y, x, Gdx.graphics.getHeight() - y);
-			drawLerped(new Vector2((int) last.x, Gdx.graphics.getHeight() - (int) last.y), new Vector2(touch.x, Gdx.graphics.getHeight() - touch.y));
-			last=new Vector2(touch.x, touch.y);
-			//pixmap.fillCircle(x, y,5 );
+			//drawLerped(new Vector2((int) last.x, Gdx.graphics.getHeight() - (int) last.y), new Vector2(touch.x, Gdx.graphics.getHeight() - touch.y));
+			///pixmap.fillCircle(x, y,5 );
 			System.out.println("touch Drr" + x + " " + y);
 
 		}

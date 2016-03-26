@@ -1,0 +1,18 @@
+text.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: non
+background-text
+  rotate: false
+  xy: 1, 1
+  size: 1269, 223
+  orig: 1269, 223
+  offset: 0, 0
+  index: -1
+buttonback
+  rotate: false
+  xy: 1, 307
+  size: 553, 559
+  orig:  553, 559
+  offset: 0, 0
+  index: -

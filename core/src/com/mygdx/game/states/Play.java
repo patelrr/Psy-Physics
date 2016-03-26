@@ -233,7 +233,7 @@ public class Play extends GameState implements InputProcessor {
 		sb.begin();
 
 		//sb.draw(img,0,0);
-/*
+
 		for(int i=0;i<tall.size();i++){
 			Sprite s=new Sprite(tall.get(i));
 			s.setOrigin(all.get(i).getWorldCenter().x, all.get(i).getWorldCenter().y);
@@ -248,7 +248,7 @@ public class Play extends GameState implements InputProcessor {
 							getScaleY(),s.getRotation());
 							*/
 
-//		}
+		}
 
 		//pixmaptex= ;
 

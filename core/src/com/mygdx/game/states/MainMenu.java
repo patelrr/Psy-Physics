@@ -5,6 +5,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -21,8 +22,6 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.handlers.GameStateManager;
 import com.mygdx.game.main.Game;
 import com.mygdx.game.view.Button;
-
-import static com.mygdx.game.handlers.B2DVars.PPM;
 
 /**
  * Created by Dell on 24-03-2016.
@@ -86,7 +85,11 @@ public class MainMenu extends GameState implements InputProcessor {
     private TextButton button;
     TextureRegion logo,play,credit;
     Table root;
+    float stateTime;
+    TextureRegion                   currentFrame;           // #7
+    TextureRegion[]                 drawFrames;
     Texture background,wood;
+    Animation drawAnimation;
     private TextureAtlas textatlas;
     private Viewport viewport;
     private OrthographicCamera camera;
@@ -99,7 +102,7 @@ public class MainMenu extends GameState implements InputProcessor {
         textatlas = new TextureAtlas("dataa/text.atlas");
         wood=new Texture(Gdx.files.internal("dataa/wood.png"));
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, Game.V_WIDTH / PPM, Game.V_HEIGHT / PPM);
+        camera.setToOrtho(false, Game.V_WIDTH , Game.V_HEIGHT );
 
         root = new Table();
         root.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -172,7 +175,13 @@ public class MainMenu extends GameState implements InputProcessor {
         buttons[0] = new Button(play);
 
         buttons[0].setPos(525,200);
-       // TextureRegionDrawable trd=new TextureRegionDrawable(new TextureRegion(new Texture(textSkin.get("backgroundtext"))));
+        drawFrames = new TextureRegion[25];
+
+        for(int i=1;i<=25;i++){
+            drawFrames[i-1]=new TextureRegion(new Texture(Gdx.files.internal("anim/"+i+".png")));
+        }
+        drawAnimation = new Animation(0.15f, drawFrames);
+        // TextureRegionDrawable trd=new TextureRegionDrawable(new TextureRegion(new Texture(textSkin.get("backgroundtext"))));
 
        // Stack stack = new Stack();
 
@@ -192,7 +201,7 @@ public class MainMenu extends GameState implements InputProcessor {
         //image.setScaling(Scaling.fill);
         //root.add(imaget).height(200).fill(400,100);
 
-        //stage.addActor(button);
+        stage.addActor(button);
         Gdx.input.setInputProcessor(this);
     }
 
@@ -212,11 +221,14 @@ public class MainMenu extends GameState implements InputProcessor {
     public void render() {
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        stateTime += Gdx.graphics.getDeltaTime();           // #15
+        currentFrame = drawAnimation.getKeyFrame(stateTime, true);  // #16
         stage.act();
         sb.begin();
         sb.draw(background, 0, 0);
         sb.draw(wood, 400, 0);
         buttons[0].draw(sb);
+        sb.draw(currentFrame, 50, 50,500,200);
         sb.draw(credit,525,140);
         sb.draw(logo,10,350);
         //stage.draw();
@@ -285,7 +297,7 @@ public class MainMenu extends GameState implements InputProcessor {
         touchPos.set(screenX, screenY, 0);
         camera.unproject(touchPos);
         System.out.println(touchPos.x + " " + touchPos.y);
-        //System.out.println(buttons[0].isPressed(touchPos));
+      //  System.out.println(buttons[0].isPressed(touchPos));
         System.out.println(touchPos.x + " " + touchPos.y);
         if(buttons[0].isPressed(touchPos)){
             System.out.println("Hwre");

@@ -403,7 +403,8 @@ public class Play extends GameState implements InputProcessor {
 		touch.y=touch.y*PPM;
 		x=(int)touch.x;y= (int) (touch.y);
 		ar.add(new Vector2(x / PPM, y / PPM));
-		updatePoints(ar, world);
+		createPhysicBodies(ar, world);
+		//updatePoints(ar, world);
 		drawLerped(new Vector2((int) last.x, Gdx.graphics.getHeight() - (int) last.y), new Vector2(x, Gdx.graphics.getHeight() - y));
 
 		pixmaptex= new Texture( pixmap );
@@ -514,6 +515,7 @@ public class Play extends GameState implements InputProcessor {
 	public boolean scrolled(int amount) {
 		return false;
 	}
+
 }
 
 

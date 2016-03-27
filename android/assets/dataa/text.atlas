@@ -1,0 +1,33 @@
+textatlas.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: non
+backgroundtext
+  rotate: false
+  xy: 1, 1
+  size: 554, 100
+  orig: 260,48
+  offset: 0, 0
+  index: -1
+buttonback
+  rotate: false
+  xy: 1, 168
+  size: 248,255
+  orig:  248,255
+  offset: 0, 0
+  index: -1
+play
+    rotate: false
+    xy: 1, 100
+    size: 129,64
+    orig:  0,0
+    offset: 0, 0
+    index: -1
+credit
+    rotate: false
+    xy: 130, 100
+    size: 180,64
+    orig:  0,0
+    offset: 0, 0
+    index: -1
+

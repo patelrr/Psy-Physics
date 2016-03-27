@@ -9,8 +9,8 @@ public abstract class GameState {
 	
 	protected GameStateManager gsm;
 	protected Game game;
-	
-	public SpriteBatch sb;
+
+	protected SpriteBatch sb;
 	protected OrthographicCamera cam;
 	protected OrthographicCamera hudCam;
 	

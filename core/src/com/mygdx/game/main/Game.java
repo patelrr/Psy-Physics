@@ -2,6 +2,7 @@ package com.mygdx.game.main;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.game.handlers.GameStateManager;
@@ -15,7 +16,7 @@ public class Game implements ApplicationListener {
 	
 	public static final float STEP = 1 / 60f;
 	private float accum;
-	
+	Music rainMusic;
 	private SpriteBatch sb;
 	private OrthographicCamera cam;
 	private OrthographicCamera hudCam;
@@ -29,8 +30,10 @@ public class Game implements ApplicationListener {
 		cam.setToOrtho(false, V_WIDTH, V_HEIGHT);
 		hudCam = new OrthographicCamera();
 		hudCam.setToOrtho(false, V_WIDTH, V_HEIGHT);
-		
+		rainMusic = Gdx.audio.newMusic(Gdx.files.internal("data/audio.mp3"));
+		rainMusic.setLooping(true);
 		gsm = new GameStateManager(this);
+		rainMusic.play();
 		
 	}
 	
